@@ -28,12 +28,12 @@ namespace AdaptiveOAuthBot.Dialogs
                 InvalidPrompt = new ActivityTemplate("Login was not successful please try again."),
                 Timeout = 300000,
                 MaxTurnCount = 3,
-                Property = "turn.token",
+                Property = "turn.oauth",
             };
 
 
             string[] paths = { ".", "Dialogs", $"RootDialog.lg" };
-            string fullPath = Path.Combine(paths);
+            var fullPath = Path.Combine(paths);
 
             // These steps are executed when this Adaptive Dialog begins
             Triggers = new List<OnCondition>
@@ -53,9 +53,7 @@ namespace AdaptiveOAuthBot.Dialogs
             Generator = new TemplateEngineLanguageGenerator(Templates.ParseFile(fullPath));
         }
 
-        private static List<Dialog> WelcomeUserSteps()
-        {
-            return new List<Dialog>
+        private static List<Dialog> WelcomeUserSteps() => new List<Dialog>
             {
                 // Iterate through membersAdded list and greet user added to the conversation.
                 new Foreach()
@@ -76,17 +74,14 @@ namespace AdaptiveOAuthBot.Dialogs
                     }
                 }
             };
-        }
 
-        private List<Dialog> LoginSteps()
-        {
-            return new List<Dialog>
+        private List<Dialog> LoginSteps() => new List<Dialog>
             {
                 MyOAuthInput,
                 //new SendActivity("\\{turn.token.token} = `${turn.token.token}`."),
                 new IfCondition
                 {
-                    Condition = "turn.token.token && length(turn.token.token)",
+                    Condition = "turn.oauth.token && length(turn.oauth.token)",
                     Actions = LoginSuccessSteps(),
                     ElseActions =
                     {
@@ -95,11 +90,8 @@ namespace AdaptiveOAuthBot.Dialogs
                 },
                 new EndDialog(),
             };
-        }
 
-        private List<Dialog> LoginSuccessSteps()
-        {
-            return new List<Dialog>
+        private List<Dialog> LoginSuccessSteps() => new List<Dialog>
             {
                 new SendActivity("You are now logged in."),
                 new ConfirmInput
@@ -119,10 +111,9 @@ namespace AdaptiveOAuthBot.Dialogs
                     Actions =
                     {
                         MyOAuthInput,
-                        new SendActivity("Here is your token `${turn.token.token}`."),
+                        new SendActivity("Here is your token `${turn.oauth.token}`."),
                     },
                 },
             };
-        }
     }
 }
