@@ -85,46 +85,40 @@ namespace AdaptiveOAuthBot.Dialogs
                 new IfCondition
                 {
                     Condition = "turn.token.token && length(turn.token.token)",
+                    Actions = LoginSuccessSteps(),
                     ElseActions =
                     {
                         new SendActivity("Sorry, we were unable to log you in."),
                     },
-                    Actions =
-                    {
-                        new SendActivity("You are now logged in."),
-                        new ConfirmInput
-                        {
-                            Prompt = new ActivityTemplate("Would you like to view your token?"),
-                            InvalidPrompt = new ActivityTemplate("Oops, I didn't understand. Would you like to view your token?"),
-                            MaxTurnCount = 3,
-                        },
-                        new IfCondition
-                        {
-                            Condition = "turn.lastResult == true",
-                            ElseActions =
-                            {
-                                new SendActivity("Great. Type anything to continue."),
-                            },
-                            Actions =
-                            {
-                                MyOAuthInput,
-                                new IfCondition
-                                {
-                                    Condition = "turn.token.token && length(turn.token.token)",
-                                    Actions =
-                                    {
-                                        new SendActivity("Here is your token `${turn.token.token}`."),
-                                    },
-                                    ElseActions =
-                                    {
-                                        new SendActivity("We were unable to retrieve your token for some reason."),
-                                    },
-                                },
-                            },
-                        },
-                    },
                 },
                 new EndDialog(),
+            };
+        }
+
+        private List<Dialog> LoginSuccessSteps()
+        {
+            return new List<Dialog>
+            {
+                new SendActivity("You are now logged in."),
+                new ConfirmInput
+                {
+                    Prompt = new ActivityTemplate("Would you like to view your token?"),
+                    InvalidPrompt = new ActivityTemplate("Oops, I didn't understand. Would you like to view your token?"),
+                    MaxTurnCount = 3,
+                },
+                new IfCondition
+                {
+                    Condition = "turn.lastResult == true",
+                    ElseActions =
+                    {
+                        new SendActivity("Great. Type anything to continue."),
+                    },
+                    Actions =
+                    {
+                        MyOAuthInput,
+                        new SendActivity("Here is your token `${turn.token.token}`."),
+                    },
+                },
             };
         }
     }
