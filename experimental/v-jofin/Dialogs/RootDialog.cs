@@ -26,6 +26,7 @@ namespace AdaptiveOAuthBot.Dialogs
                 InvalidPrompt = new ActivityTemplate("Login was not successful please try again."),
                 Timeout = 300000,
                 MaxTurnCount = 3,
+                Property = "turn.token",
             };
 
 
@@ -80,10 +81,14 @@ namespace AdaptiveOAuthBot.Dialogs
             return new List<Dialog>
             {
                 MyOAuthInput,
-                //new SendActivity("Turn result = $turn.lastResult"),
+                //new SendActivity("\\{turn.token.token} = `${turn.token.token}`."),
                 new IfCondition
                 {
-                    Condition = "turn.lastResult && length($turn.lastResult) > 0",
+                    Condition = "turn.token.token && length(turn.token.token)",
+                    ElseActions =
+                    {
+                        new SendActivity("Sorry, we were unable to log you in."),
+                    },
                     Actions =
                     {
                         new SendActivity("You are now logged in."),
@@ -96,20 +101,19 @@ namespace AdaptiveOAuthBot.Dialogs
                         new IfCondition
                         {
                             Condition = "turn.lastResult == true",
+                            ElseActions =
+                            {
+                                new SendActivity("Great. Type anything to continue."),
+                            },
                             Actions =
                             {
                                 MyOAuthInput,
-                                new SetProperty
-                                {
-                                    Property = "$token",
-                                    Value = "turn.lastResult",
-                                },
                                 new IfCondition
                                 {
-                                    Condition = "$token && length($token) > 0",
+                                    Condition = "turn.token.token && length(turn.token.token)",
                                     Actions =
                                     {
-                                        new SendActivity("Here is your token `$token`."),
+                                        new SendActivity("Here is your token `${turn.token.token}`."),
                                     },
                                     ElseActions =
                                     {
@@ -118,10 +122,6 @@ namespace AdaptiveOAuthBot.Dialogs
                                 },
                             },
                         },
-                    },
-                    ElseActions =
-                    {
-                        new SendActivity("Sorry, we were unable to log you in."),
                     },
                 },
                 new EndDialog(),
