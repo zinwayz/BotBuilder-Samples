@@ -18,6 +18,8 @@ namespace AdaptiveOAuthBot.Dialogs
 
         public RootDialog(IConfiguration configuration) : base(nameof(RootDialog))
         {
+            // Using the turn scope for this property, as the token is ephemeral.
+            // If we need a copy of the token at any point, we should use this prompt to get the current token.
             MyOAuthInput = new OAuthInput
             {
                 ConnectionName = configuration["ConnectionName"],
@@ -105,10 +107,11 @@ namespace AdaptiveOAuthBot.Dialogs
                     Prompt = new ActivityTemplate("Would you like to view your token?"),
                     InvalidPrompt = new ActivityTemplate("Oops, I didn't understand. Would you like to view your token?"),
                     MaxTurnCount = 3,
+                    Property = "turn.Confirmed",
                 },
                 new IfCondition
                 {
-                    Condition = "turn.lastResult == true",
+                    Condition = "=turn.Confirmed",
                     ElseActions =
                     {
                         new SendActivity("Great. Type anything to continue."),
