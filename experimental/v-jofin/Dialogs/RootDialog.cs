@@ -20,13 +20,14 @@ namespace AdaptiveOAuthBot.Dialogs
         {
             // Using the turn scope for this property, as the token is ephemeral.
             // If we need a copy of the token at any point, we should use this prompt to get the current token.
+            // Only leave the prompt up for 1 minute. (Is there a way to not reprompt if this times-out?)
             MyOAuthInput = new OAuthInput
             {
                 ConnectionName = configuration["ConnectionName"],
                 Title = "Please log in",
                 Text = "This will give you access!",
                 InvalidPrompt = new ActivityTemplate("Login was not successful please try again."),
-                Timeout = 300000,
+                Timeout = 1000 * 60,
                 MaxTurnCount = 3,
                 Property = "turn.oauth",
             };
@@ -47,7 +48,20 @@ namespace AdaptiveOAuthBot.Dialogs
                     // Respond to user on message activity
                     new OnUnknownIntent
                     {
-                        Actions = LoginSteps(),
+                        Actions =
+                        {
+                            MyOAuthInput,
+                            new IfCondition
+                            {
+                                Condition = "turn.oauth.token && length(turn.oauth.token) > 0",
+                                Actions = LoginSuccessSteps(),
+                                ElseActions =
+                                {
+                                    new SendActivity("Sorry, we were unable to log you in."),
+                                },
+                            },
+                            new EndDialog(),
+                        }
                     },
                 };
             Generator = new TemplateEngineLanguageGenerator(Templates.ParseFile(fullPath));
@@ -73,22 +87,6 @@ namespace AdaptiveOAuthBot.Dialogs
                         }
                     }
                 }
-            };
-
-        private List<Dialog> LoginSteps() => new List<Dialog>
-            {
-                MyOAuthInput,
-                //new SendActivity("\\{turn.token.token} = `${turn.token.token}`."),
-                new IfCondition
-                {
-                    Condition = "turn.oauth.token && length(turn.oauth.token)",
-                    Actions = LoginSuccessSteps(),
-                    ElseActions =
-                    {
-                        new SendActivity("Sorry, we were unable to log you in."),
-                    },
-                },
-                new EndDialog(),
             };
 
         private List<Dialog> LoginSuccessSteps() => new List<Dialog>

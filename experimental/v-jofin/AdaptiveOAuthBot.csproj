@@ -29,6 +29,13 @@
     <Content Include="**/*.lu">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Compile Remove="%2a%2a\**" />
+    <Content Remove="%2a%2a\**" />
+    <EmbeddedResource Remove="%2a%2a\**" />
+    <None Remove="%2a%2a\**" />
+    <Content Remove="%2a%2a/%2a.dialog" />
+    <Content Remove="%2a%2a/%2a.lg" />
+    <Content Remove="%2a%2a/%2a.lu" />
     <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

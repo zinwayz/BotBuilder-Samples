@@ -24,7 +24,11 @@ namespace Microsoft.BotBuilderSamples
         {
             Logger = logger;
 
-            DialogManager = new DialogManager(rootDialog);
+            // Have the conversation state auto-expire after 5 minutes.
+            DialogManager = new DialogManager(rootDialog)
+            {
+                ExpireAfter = 5000*60,
+            };
         }
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
