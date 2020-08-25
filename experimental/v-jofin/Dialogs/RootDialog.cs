@@ -14,16 +14,15 @@ namespace AdaptiveOAuthBot.Dialogs
 {
     public class RootDialog : AdaptiveDialog
     {
-        private const string OAUTH_PROMPT = "MSGraph-OAuth-prompt";
+        private OAuthInput MyOAuthInput { get; }
 
-        public RootDialog(IConfiguration configuration, string dialogId = "RootDialog") : base(dialogId)
+        public RootDialog(IConfiguration configuration) : base(nameof(RootDialog))
         {
             // Using the turn scope for this property, as the token is ephemeral.
             // If we need a copy of the token at any point, we should use this prompt to get the current token.
             // Only leave the prompt up for 1 minute. (Is there a way to not reprompt if this times-out?)
-            var oauthInput = new OAuthInput
+            MyOAuthInput = new OAuthInput
             {
-                Id = OAUTH_PROMPT,
                 ConnectionName = configuration["ConnectionName"],
                 Title = "Please log in",
                 Text = "This will give you access!",
@@ -32,7 +31,7 @@ namespace AdaptiveOAuthBot.Dialogs
                 MaxTurnCount = 3,
                 Property = "turn.oauth",
             };
-            Dialogs.Add(oauthInput);
+            Dialogs.Add(MyOAuthInput);
 
             var fullPath = Path.Combine(".", "Dialogs", $"RootDialog.lg");
             Generator = new TemplateEngineLanguageGenerator(Templates.ParseFile(fullPath));
@@ -53,7 +52,7 @@ namespace AdaptiveOAuthBot.Dialogs
                         {
                             new CodeAction(async (dc, opt) =>
                             {
-                                await oauthInput.SignOutUserAsync(dc);
+                                await MyOAuthInput.SignOutUserAsync(dc);
                                 return new DialogTurnResult(DialogTurnStatus.Complete);
                             }),
                         }
@@ -64,7 +63,8 @@ namespace AdaptiveOAuthBot.Dialogs
                     {
                         Actions =
                         {
-                            new BeginDialog(OAUTH_PROMPT),
+                            //new BeginDialog(OAUTH_PROMPT),
+                            MyOAuthInput,
                             new IfCondition
                             {
                                 Condition = "turn.oauth.token && length(turn.oauth.token) > 0",
@@ -117,7 +117,7 @@ namespace AdaptiveOAuthBot.Dialogs
                     Condition = "=turn.Confirmed",
                     Actions =
                     {
-                        new BeginDialog(OAUTH_PROMPT),
+                        MyOAuthInput,
                         new SendActivity("Here is your token `${turn.oauth.token}`."),
                     },
                     ElseActions =
