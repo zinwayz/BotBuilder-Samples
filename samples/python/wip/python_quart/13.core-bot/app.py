@@ -17,6 +17,7 @@ from botbuilder.core import (
     UserState,
 )
 from botbuilder.schema import Activity
+from botbuilder.ai.qna import QnAMaker, QnAMakerEndpoint
 
 from dialogs import MainDialog, BookingDialog
 from bots import DialogAndWelcomeBot
@@ -41,9 +42,16 @@ CONVERSATION_STATE = ConversationState(MEMORY)
 ADAPTER = AdapterWithErrorHandler(SETTINGS, CONVERSATION_STATE)
 
 # Create dialogs and Bot
-RECOGNIZER = FlightBookingRecognizer(APP.config)
+LUIS_RECOGNIZER = FlightBookingRecognizer(APP.config)
+QNAMAKER = QnAMaker(
+    QnAMakerEndpoint(
+        knowledge_base_id=APP.config["QNA_KNOWLEDGEBASE_ID"],
+        endpoint_key=APP.config["QNA_ENDPOINT_KEY"],
+        host=APP.config["QNA_ENDPOINT_HOST"],
+    )
+)
 BOOKING_DIALOG = BookingDialog()
-DIALOG = MainDialog(RECOGNIZER, BOOKING_DIALOG)
+DIALOG = MainDialog(LUIS_RECOGNIZER, QNAMAKER, BOOKING_DIALOG)
 BOT = DialogAndWelcomeBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 
 

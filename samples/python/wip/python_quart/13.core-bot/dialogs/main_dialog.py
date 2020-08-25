@@ -7,6 +7,7 @@ from botbuilder.dialogs import (
     WaterfallStepContext,
     DialogTurnResult,
 )
+# from botbuilder.ai.qna import QnAMaker
 from botbuilder.dialogs.prompts import TextPrompt, PromptOptions
 from botbuilder.core import MessageFactory, TurnContext
 from botbuilder.schema import InputHints
@@ -16,14 +17,18 @@ from flight_booking_recognizer import FlightBookingRecognizer
 from helpers.luis_helper import LuisHelper, Intent
 from .booking_dialog import BookingDialog
 
+from config import DefaultConfig
+from botbuilder.ai.qna import QnAMaker, QnAMakerEndpoint
+
 
 class MainDialog(ComponentDialog):
     def __init__(
-        self, luis_recognizer: FlightBookingRecognizer, booking_dialog: BookingDialog
+        self, luis_recognizer: FlightBookingRecognizer, qnamaker: QnAMaker,booking_dialog: BookingDialog
     ):
         super(MainDialog, self).__init__(MainDialog.__name__)
 
         self._luis_recognizer = luis_recognizer
+        self._qnamaker = qnamaker
         self._booking_dialog_id = booking_dialog.id
 
         self.add_dialog(TextPrompt(TextPrompt.__name__))
@@ -89,13 +94,15 @@ class MainDialog(ComponentDialog):
             await step_context.context.send_activity(get_weather_message)
 
         else:
-            didnt_understand_text = (
-                "Sorry, I didn't get that. Please try asking in a different way"
+            calling_qna_text = (
+                "No LUIS intent recognized. Calling QnAMaker..."
             )
-            didnt_understand_message = MessageFactory.text(
-                didnt_understand_text, didnt_understand_text, InputHints.ignoring_input
+            calling_qna_message = MessageFactory.text(
+                calling_qna_text, calling_qna_text, InputHints.ignoring_input
             )
-            await step_context.context.send_activity(didnt_understand_message)
+            await step_context.context.send_activity(calling_qna_message)
+
+            await self._call_qnamaker(step_context.context)
 
         return await step_context.next(None)
 
@@ -116,6 +123,16 @@ class MainDialog(ComponentDialog):
 
         prompt_message = "What else can I do for you?"
         return await step_context.replace_dialog(self.id, prompt_message)
+    
+    async def _call_qnamaker(self, turn_context: TurnContext):
+        results = await (self._qnamaker.get_answers(turn_context))
+
+        if results:
+            await turn_context.send_activity(results[0].answer)
+        else:
+            await turn_context.send_activity(
+                "Sorry, could not find an answer in the Q and A system."
+            )
 
     @staticmethod
     async def _show_warning_for_unsupported_cities(
