@@ -1,4 +1,6 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
+﻿using System.Collections.Generic;
+using System.IO;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Adaptive;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Actions;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Conditions;
@@ -7,22 +9,21 @@ using Microsoft.Bot.Builder.Dialogs.Adaptive.Input;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Templates;
 using Microsoft.Bot.Builder.LanguageGeneration;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.IO;
 
 namespace AdaptiveOAuthBot.Dialogs
 {
     public class RootDialog : AdaptiveDialog
     {
-        private OAuthInput MyOAuthInput { get; }
+        private const string OAUTH_PROMPT = "MSGraph-OAuth-prompt";
 
-        public RootDialog(IConfiguration configuration) : base(nameof(RootDialog))
+        public RootDialog(IConfiguration configuration, string dialogId = "RootDialog") : base(dialogId)
         {
             // Using the turn scope for this property, as the token is ephemeral.
             // If we need a copy of the token at any point, we should use this prompt to get the current token.
             // Only leave the prompt up for 1 minute. (Is there a way to not reprompt if this times-out?)
-            MyOAuthInput = new OAuthInput
+            var oauthInput = new OAuthInput
             {
+                Id = OAUTH_PROMPT,
                 ConnectionName = configuration["ConnectionName"],
                 Title = "Please log in",
                 Text = "This will give you access!",
@@ -31,26 +32,39 @@ namespace AdaptiveOAuthBot.Dialogs
                 MaxTurnCount = 3,
                 Property = "turn.oauth",
             };
+            Dialogs.Add(oauthInput);
 
-
-            string[] paths = { ".", "Dialogs", $"RootDialog.lg" };
-            var fullPath = Path.Combine(paths);
+            var fullPath = Path.Combine(".", "Dialogs", $"RootDialog.lg");
+            Generator = new TemplateEngineLanguageGenerator(Templates.ParseFile(fullPath));
 
             // These steps are executed when this Adaptive Dialog begins
             Triggers = new List<OnCondition>
                 {
-                    // Add a rule to welcome user
+                    // Add a rule to welcome the user.
                     new OnConversationUpdateActivity
                     {
                         Actions = WelcomeUserSteps(),
                     },
 
-                    // Respond to user on message activity
+                    // Allow the use to sign out.
+                    new OnIntent("logout")
+                    {
+                        Actions =
+                        {
+                            new CodeAction(async (dc, opt) =>
+                            {
+                                await oauthInput.SignOutUserAsync(dc);
+                                return new DialogTurnResult(DialogTurnStatus.Complete);
+                            }),
+                        }
+                    },
+
+                    // Respond to user on message activity.
                     new OnUnknownIntent
                     {
                         Actions =
                         {
-                            MyOAuthInput,
+                            new BeginDialog(OAUTH_PROMPT),
                             new IfCondition
                             {
                                 Condition = "turn.oauth.token && length(turn.oauth.token) > 0",
@@ -64,7 +78,6 @@ namespace AdaptiveOAuthBot.Dialogs
                         }
                     },
                 };
-            Generator = new TemplateEngineLanguageGenerator(Templates.ParseFile(fullPath));
         }
 
         private static List<Dialog> WelcomeUserSteps() => new List<Dialog>
@@ -102,14 +115,14 @@ namespace AdaptiveOAuthBot.Dialogs
                 new IfCondition
                 {
                     Condition = "=turn.Confirmed",
+                    Actions =
+                    {
+                        new BeginDialog(OAUTH_PROMPT),
+                        new SendActivity("Here is your token `${turn.oauth.token}`."),
+                    },
                     ElseActions =
                     {
                         new SendActivity("Great. Type anything to continue."),
-                    },
-                    Actions =
-                    {
-                        MyOAuthInput,
-                        new SendActivity("Here is your token `${turn.oauth.token}`."),
                     },
                 },
             };
