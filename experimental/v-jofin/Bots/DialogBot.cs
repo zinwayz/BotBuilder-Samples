@@ -31,6 +31,7 @@ namespace Microsoft.BotBuilderSamples
             };
         }
 
+        // Every turn, forward the activity to the root adaptive dialog.
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
             Logger.LogInformation("Running dialog with Activity.");

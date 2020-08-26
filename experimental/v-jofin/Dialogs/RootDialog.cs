@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Microsoft.Bot.Builder.AI.Luis;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Adaptive;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Actions;
@@ -33,8 +34,16 @@ namespace AdaptiveOAuthBot.Dialogs
             };
             Dialogs.Add(MyOAuthInput);
 
-            var fullPath = Path.Combine(".", "Dialogs", $"RootDialog.lg");
+            var fullPath = Path.Combine(".", "Dialogs", $"{nameof(RootDialog)}.lg");
             Generator = new TemplateEngineLanguageGenerator(Templates.ParseFile(fullPath));
+
+            // This implies the LUIS model has been published prior to running the bot.
+            Recognizer = new LuisAdaptiveRecognizer
+            {
+                ApplicationId = configuration[$"{nameof(RootDialog)}:luis:en_us:appId"],
+                EndpointKey = configuration[$"{nameof(RootDialog)}:luis:key"],
+                Endpoint = configuration[$"{nameof(RootDialog)}:luis:hostname"],
+            };
 
             // These steps are executed when this Adaptive Dialog begins
             Triggers = new List<OnCondition>
@@ -46,7 +55,7 @@ namespace AdaptiveOAuthBot.Dialogs
                     },
 
                     // Allow the use to sign out.
-                    new OnIntent("logout")
+                    new OnIntent("Logout")
                     {
                         Actions =
                         {

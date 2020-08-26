@@ -15,20 +15,6 @@ class EchoBot extends ActivityHandler {
 
         const lgFilePath = path.join(__dirname, './resources/main.lg');
 
-        // add the custom function
-        Expression.functions.add(mySqrtFnName, (args) => {
-            let retValue = null;
-            if (args[0] !== null) {
-                try {
-                    const dblValue = parseFloat(args[0]);
-                    retValue = Math.sqrt(dblValue);
-                } catch (ex) {
-                    return retValue;
-                }
-            }
-            return retValue;
-        });
-
         // by default this uses Expression.functions.
         this.lgTemplates = Templates.parseFile(lgFilePath);
 
