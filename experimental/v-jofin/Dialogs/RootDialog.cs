@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.Bot.Builder.AI.Luis;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Adaptive;
@@ -33,20 +34,17 @@ namespace AdaptiveOAuthBot.Dialogs
                 Endpoint = configuration[$"{nameof(RootDialog)}:luis:hostname"],
             };
 
+            // Just loop when the inner dialog stack is empty, instead of ending and restarting.
+            AutoEndDialog = false;
+
             // Using the turn scope for this property, as the token is ephemeral.
             // If we need a copy of the token at any point, we should use this prompt to get the current token.
             // Only leave the prompt up for 1 minute. (Is there a way to not reprompt if this times-out?)
             MyOAuthInput = new OAuthInput
             {
                 ConnectionName = configuration["ConnectionName"],
-                //Title = "${SigninTitle()}",
-                //Text = "${SigninText()}",
-                //Title = _templates.Evaluate("${SigninTitle()}").ToString(),
-                //Text = _templates.Evaluate("${SigninText()}").ToString(),
-                //Title = _templates.Evaluate("${SigninTitle()}") as string,
-                //Text = _templates.Evaluate("${SigninText()}") as string,
-                Title = "button text",
-                Text = "card text",
+                Title = _templates.Evaluate("SigninTitle").ToString(),
+                Text = _templates.Evaluate("SigninText").ToString(),
                 InvalidPrompt = new ActivityTemplate("${SigninReprompt()}"),
                 Timeout = 15000,
                 MaxTurnCount = 3,
@@ -60,10 +58,24 @@ namespace AdaptiveOAuthBot.Dialogs
                     // Add a rule to welcome the user.
                     new OnConversationUpdateActivity
                     {
-                        Actions = WelcomeUserSteps(),
+                        Actions =
+                        {
+                            new CodeAction(async (dc, opt) =>
+                            {
+                                var activity =dc.Context.Activity.AsConversationUpdateActivity();
+                                var botId = activity.Recipient.Id;
+                                if (activity.MembersAdded.Any(m => m.Id != botId))
+                                {
+                                    var text = _templates.Evaluate("WelcomeMessage").ToString();
+                                    await dc.Context.SendActivityAsync(text);
+                                }
+                                return await dc.EndDialogAsync();
+                            }),
+                            new EndDialog(),
+                        }
                     },
 
-                    // Allow the use to sign out.
+                    // Allow the user to sign out.
                     new OnIntent("Logout")
                     {
                         Actions =
@@ -71,10 +83,10 @@ namespace AdaptiveOAuthBot.Dialogs
                             new CodeAction(async (dc, opt) =>
                             {
                                 await MyOAuthInput.SignOutUserAsync(dc);
-                                await dc.Context.SendActivityAsync("logged out, yay.");
-                                return new DialogTurnResult(DialogTurnStatus.Complete);
+                                return await dc.EndDialogAsync();
                             }),
                             new SendActivity("${SignoutCompleted()}"),
+                            new CancelAllDialogs(),
                         }
                     },
 
@@ -93,32 +105,11 @@ namespace AdaptiveOAuthBot.Dialogs
                                     new SendActivity("${SigninFailed()}"),
                                 },
                             },
+                            new EndDialog(),
                         }
                     },
                 };
         }
-
-        private static List<Dialog> WelcomeUserSteps() => new List<Dialog>
-            {
-                // Iterate through membersAdded list and greet user added to the conversation.
-                new Foreach()
-                {
-                    ItemsProperty = "turn.activity.membersAdded",
-                    Actions =
-                    {
-                        // Note: Some channels send two conversation update events - one for the Bot added to the conversation and another for user.
-                        // Filter cases where the bot itself is the recipient of the message. 
-                        new IfCondition()
-                        {
-                            Condition = "$foreach.value.name != turn.activity.recipient.name",
-                            Actions =
-                            {
-                                new SendActivity("Hello, I'm the multi-turn prompt bot. Please send a message to get started!")
-                            }
-                        }
-                    }
-                }
-            };
 
         private List<Dialog> LoginSuccessSteps() => new List<Dialog>
             {
@@ -136,7 +127,6 @@ namespace AdaptiveOAuthBot.Dialogs
                     Actions =
                     {
                         MyOAuthInput,
-                        // new SendActivity("Here is your token `${turn.oauth.token}`."),
                         new SendActivity("${ShowToken()}"),
                     },
                     ElseActions =

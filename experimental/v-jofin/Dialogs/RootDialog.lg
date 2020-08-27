@@ -5,12 +5,10 @@
 - Welcome to the OAuth _proof-of-concept_ bot.
 
 # SigninTitle
-- Sign in to MSGraph
-- Sing in (Card text or title?s)
+- Click to sign in
 
 # SigninText
-- Sign in
-- Sign in (button text?)
+- Sign in to MSGraph
 
 # SigninReprompt
 - I'm sorry. Login was not successful please try again.
