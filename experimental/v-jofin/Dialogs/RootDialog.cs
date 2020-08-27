@@ -20,6 +20,19 @@ namespace AdaptiveOAuthBot.Dialogs
 
         public RootDialog(IConfiguration configuration) : base(nameof(RootDialog))
         {
+            var fullPath = Path.Combine(".", "Dialogs", "RootDialog.lg");
+            _templates = Templates.ParseFile(fullPath);
+            Generator = new TemplateEngineLanguageGenerator(_templates);
+
+            // This implies the LUIS model has been published prior to running the bot.
+            // This should be done through the consumption of a .dialog file?
+            Recognizer = new LuisAdaptiveRecognizer
+            {
+                ApplicationId = configuration[$"{nameof(RootDialog)}:luis:en_us_appId"],
+                EndpointKey = configuration[$"{nameof(RootDialog)}:luis:key"],
+                Endpoint = configuration[$"{nameof(RootDialog)}:luis:hostname"],
+            };
+
             // Using the turn scope for this property, as the token is ephemeral.
             // If we need a copy of the token at any point, we should use this prompt to get the current token.
             // Only leave the prompt up for 1 minute. (Is there a way to not reprompt if this times-out?)
@@ -40,19 +53,6 @@ namespace AdaptiveOAuthBot.Dialogs
                 Property = "turn.oauth",
             };
             Dialogs.Add(MyOAuthInput);
-
-            var fullPath = Path.Combine(".", "Dialogs", "RootDialog.lg");
-            _templates = Templates.ParseFile(fullPath);
-            Generator = new TemplateEngineLanguageGenerator(_templates);
-
-            // This implies the LUIS model has been published prior to running the bot.
-            // This should be done through the consumption of a .dialog file?
-            Recognizer = new LuisAdaptiveRecognizer
-            {
-                ApplicationId = configuration[$"{nameof(RootDialog)}:luis:en_us_appId"],
-                EndpointKey = configuration[$"{nameof(RootDialog)}:luis:key"],
-                Endpoint = configuration[$"{nameof(RootDialog)}:luis:hostname"],
-            };
 
             // These steps are executed when this Adaptive Dialog begins
             Triggers = new List<OnCondition>
