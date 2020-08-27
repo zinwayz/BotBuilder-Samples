@@ -16,6 +16,7 @@ namespace AdaptiveOAuthBot.Dialogs
     public class RootDialog : AdaptiveDialog
     {
         private OAuthInput MyOAuthInput { get; }
+        private readonly Templates _templates;
 
         public RootDialog(IConfiguration configuration) : base(nameof(RootDialog))
         {
@@ -25,22 +26,30 @@ namespace AdaptiveOAuthBot.Dialogs
             MyOAuthInput = new OAuthInput
             {
                 ConnectionName = configuration["ConnectionName"],
-                Title = "Please log in",
-                Text = "This will give you access!",
-                InvalidPrompt = new ActivityTemplate("Login was not successful please try again."),
-                Timeout = 1000 * 60,
+                //Title = "${SigninTitle()}",
+                //Text = "${SigninText()}",
+                //Title = _templates.Evaluate("${SigninTitle()}").ToString(),
+                //Text = _templates.Evaluate("${SigninText()}").ToString(),
+                //Title = _templates.Evaluate("${SigninTitle()}") as string,
+                //Text = _templates.Evaluate("${SigninText()}") as string,
+                Title = "button text",
+                Text = "card text",
+                InvalidPrompt = new ActivityTemplate("${SigninReprompt()}"),
+                Timeout = 15000,
                 MaxTurnCount = 3,
                 Property = "turn.oauth",
             };
             Dialogs.Add(MyOAuthInput);
 
-            var fullPath = Path.Combine(".", "Dialogs", $"{nameof(RootDialog)}.lg");
-            Generator = new TemplateEngineLanguageGenerator(Templates.ParseFile(fullPath));
+            var fullPath = Path.Combine(".", "Dialogs", "RootDialog.lg");
+            _templates = Templates.ParseFile(fullPath);
+            Generator = new TemplateEngineLanguageGenerator(_templates);
 
             // This implies the LUIS model has been published prior to running the bot.
+            // This should be done through the consumption of a .dialog file?
             Recognizer = new LuisAdaptiveRecognizer
             {
-                ApplicationId = configuration[$"{nameof(RootDialog)}:luis:en_us:appId"],
+                ApplicationId = configuration[$"{nameof(RootDialog)}:luis:en_us_appId"],
                 EndpointKey = configuration[$"{nameof(RootDialog)}:luis:key"],
                 Endpoint = configuration[$"{nameof(RootDialog)}:luis:hostname"],
             };
@@ -62,8 +71,10 @@ namespace AdaptiveOAuthBot.Dialogs
                             new CodeAction(async (dc, opt) =>
                             {
                                 await MyOAuthInput.SignOutUserAsync(dc);
+                                await dc.Context.SendActivityAsync("logged out, yay.");
                                 return new DialogTurnResult(DialogTurnStatus.Complete);
                             }),
+                            new SendActivity("${SignoutCompleted()}"),
                         }
                     },
 
@@ -72,7 +83,6 @@ namespace AdaptiveOAuthBot.Dialogs
                     {
                         Actions =
                         {
-                            //new BeginDialog(OAUTH_PROMPT),
                             MyOAuthInput,
                             new IfCondition
                             {
@@ -80,10 +90,9 @@ namespace AdaptiveOAuthBot.Dialogs
                                 Actions = LoginSuccessSteps(),
                                 ElseActions =
                                 {
-                                    new SendActivity("Sorry, we were unable to log you in."),
+                                    new SendActivity("${SigninFailed()}"),
                                 },
                             },
-                            new EndDialog(),
                         }
                     },
                 };
@@ -113,11 +122,11 @@ namespace AdaptiveOAuthBot.Dialogs
 
         private List<Dialog> LoginSuccessSteps() => new List<Dialog>
             {
-                new SendActivity("You are now logged in."),
+                new SendActivity("${SigninSuccess()}"),
                 new ConfirmInput
                 {
-                    Prompt = new ActivityTemplate("Would you like to view your token?"),
-                    InvalidPrompt = new ActivityTemplate("Oops, I didn't understand. Would you like to view your token?"),
+                    Prompt = new ActivityTemplate("${ShowTokenPrompt()}"),
+                    InvalidPrompt = new ActivityTemplate("${ShowTokenReprompt()}"),
                     MaxTurnCount = 3,
                     Property = "turn.Confirmed",
                 },
@@ -127,11 +136,12 @@ namespace AdaptiveOAuthBot.Dialogs
                     Actions =
                     {
                         MyOAuthInput,
-                        new SendActivity("Here is your token `${turn.oauth.token}`."),
+                        // new SendActivity("Here is your token `${turn.oauth.token}`."),
+                        new SendActivity("${ShowToken()}"),
                     },
                     ElseActions =
                     {
-                        new SendActivity("Great. Type anything to continue."),
+                        new SendActivity("${ShowTokenDeclined()}"),
                     },
                 },
             };

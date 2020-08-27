@@ -6,14 +6,16 @@
 
 # SigninTitle
 - Sign in to MSGraph
+- Sing in (Card text or title?s)
 
 # SigninText
 - Sign in
+- Sign in (button text?)
 
 # SigninReprompt
 - I'm sorry. Login was not successful please try again.
 
-# SigninFailure
+# SigninFailed
 - Sorry, we were unable to log you in.
 
 # SigninSuccess
@@ -26,6 +28,10 @@
 - Oops, I didn't understand. Would you like to view your token? ('yes' or 'no')
 
 # ShowToken
-- Here is your token:\n$oauth.token
+- Here is your token:\n${turn.oauth.token}
 
-#
+# ShowTokenDeclined
+- Great. Type anything to continue.
+
+# SignoutCompleted
+- You are now signed out of MSGraph.
