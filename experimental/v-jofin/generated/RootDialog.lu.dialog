@@ -1,0 +1,8 @@
+{
+    "$kind": "Microsoft.MultiLanguageRecognizer",
+    "id": "LUIS_RootDialog",
+    "recognizers": {
+        "en-us": "RootDialog.en-us.lu",
+        "": "RootDialog.en-us.lu"
+    }
+}

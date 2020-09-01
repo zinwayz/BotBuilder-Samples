@@ -21,8 +21,10 @@ namespace AdaptiveOAuthBot.Dialogs
 
         public RootDialog(IConfiguration configuration) : base(nameof(RootDialog))
         {
-            var fullPath = Path.Combine(".", "Dialogs", "RootDialog.lg");
-            _templates = Templates.ParseFile(fullPath);
+            // Just loop when the inner dialog stack is empty, instead of ending and restarting.
+            AutoEndDialog = false;
+
+            _templates = Templates.ParseFile(Path.Combine(".", "Dialogs", "RootDialog.lg"));
             Generator = new TemplateEngineLanguageGenerator(_templates);
 
             // This implies the LUIS model has been published prior to running the bot.
@@ -34,19 +36,15 @@ namespace AdaptiveOAuthBot.Dialogs
                 Endpoint = configuration[$"{nameof(RootDialog)}:luis:hostname"],
             };
 
-            // Just loop when the inner dialog stack is empty, instead of ending and restarting.
-            AutoEndDialog = false;
-
             // Using the turn scope for this property, as the token is ephemeral.
             // If we need a copy of the token at any point, we should use this prompt to get the current token.
-            // Only leave the prompt up for 1 minute. (Is there a way to not reprompt if this times-out?)
             MyOAuthInput = new OAuthInput
             {
                 ConnectionName = configuration["ConnectionName"],
                 Title = _templates.Evaluate("SigninTitle").ToString(),
                 Text = _templates.Evaluate("SigninText").ToString(),
                 InvalidPrompt = new ActivityTemplate("${SigninReprompt()}"),
-                Timeout = 15000,
+                Timeout = 60000, // This seems to be an absolute time-out, independent of the max tries.
                 MaxTurnCount = 3,
                 Property = "turn.oauth",
             };
@@ -86,9 +84,35 @@ namespace AdaptiveOAuthBot.Dialogs
                                 return await dc.EndDialogAsync();
                             }),
                             new SendActivity("${SignoutCompleted()}"),
-                            new CancelAllDialogs(),
+                            new CancelAllDialogs(), // To cancel any inputs that are mid-prompt.
                         }
                     },
+
+                    //new OnIntent("GetProfile")
+                    //{
+                    //    Actions =
+                    //    {
+                    //        MyOAuthInput,
+                    //        new IfCondition
+                    //        {
+                    //            Condition = "turn.oauth.token && length(turn.oauth.token) > 0",
+                    //            Actions =
+                    //            {
+                    //                new CodeAction(async (dc, opt) =>
+                    //                {
+                    //                    var tokenResponse = dc.State.GetMemoryScope(ScopePath.Turn).
+                    //                    await MsGraphHelper.ListMeAsync(dc.Context, tokenResponse);
+                    //                    return await dc.EndDialogAsync();
+                    //                }),
+                    //            },
+                    //            ElseActions =
+                    //            {
+                    //                new SendActivity("${SigninFailed()}"),
+                    //            },
+                    //        },
+                    //        new EndDialog(),
+                    //    },
+                    //},
 
                     // Respond to user on message activity.
                     new OnUnknownIntent
