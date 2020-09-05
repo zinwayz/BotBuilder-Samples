@@ -21,6 +21,9 @@ using Microsoft.Bot.Builder.Dialogs.Adaptive.Recognizers;
 using Microsoft.Bot.Builder.AI.QnA.Recognizers;
 using AdaptiveExpressions;
 using Microsoft.Bot.Builder;
+using Iciclecreek.Bot.Builder.Dialogs.Recognizers.QLucene;
+using Microsoft.Bot.Builder.AI.QnA;
+using Microsoft.Recognizers.Text.DateTime;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -206,10 +209,23 @@ namespace Microsoft.BotBuilderSamples
                 Recognizers = new List<Recognizer>()
                 {
                     CreateLuisRecognizer(configuration),
-                    CreateQnAMakerRecognizer(configuration)
+                    //CreateQnAMakerRecognizer(configuration)
+                    CreateQLuceneRecognizer()
                 }
             };
         }
+
+        private static Recognizer CreateQLuceneRecognizer()
+        {
+            var fullPath = Path.Join(".", "generated", $"{nameof(DeleteToDoDialog)}.qna.json");
+            var fileContent = File.ReadAllText(fullPath);
+            var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
+            qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");
+            qLuceneRecognizer.IncludeDialogNameInMetadata = true;
+            qLuceneRecognizer.Id = $"QnA_{nameof(DeleteToDoDialog)}";
+            return qLuceneRecognizer;
+        }
+
 
         private static Recognizer CreateQnAMakerRecognizer(IConfiguration configuration)
         {

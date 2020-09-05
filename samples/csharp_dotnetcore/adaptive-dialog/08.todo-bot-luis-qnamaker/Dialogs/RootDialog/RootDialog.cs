@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Adaptive;
 using Microsoft.Bot.Builder.AI.Luis;
+using Iciclecreek.Bot.Builder.Dialogs.Recognizers.QLucene;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Actions;
 using Microsoft.Bot.Builder.Dialogs.Adaptive.Conditions;
@@ -20,6 +21,8 @@ using AdaptiveExpressions;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.AI.QnA;
+using AdaptiveExpressions.Properties;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -322,7 +325,8 @@ namespace Microsoft.BotBuilderSamples
                 Recognizers = new List<Recognizer>()
                 {
                     CreateLuisRecognizer(configuration),
-                    CreateQnAMakerRecognizer(configuration)
+                    //CreateQnAMakerRecognizer(configuration)
+                    CreateQLuceneRecognizer()
                 }
             };
         }
@@ -355,6 +359,17 @@ namespace Microsoft.BotBuilderSamples
                 // Id needs to be QnA_<dialogName> for cross-trained recognizer to work.
                 Id = $"QnA_{nameof(RootDialog)}"
             };
+        }
+
+        private static Recognizer CreateQLuceneRecognizer()
+        {
+            var fullPath = Path.Join(".", "generated", $"{nameof(RootDialog)}.qna.json");
+            var fileContent = File.ReadAllText(fullPath);
+            var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
+            qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");
+            qLuceneRecognizer.IncludeDialogNameInMetadata = true;
+            qLuceneRecognizer.Id = $"QnA_{nameof(RootDialog)}";
+            return qLuceneRecognizer;
         }
 
         public static Recognizer CreateLuisRecognizer(IConfiguration Configuration)

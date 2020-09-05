@@ -20,6 +20,8 @@ using Microsoft.Bot.Builder.AI.QnA.Recognizers;
 using System.Threading.Tasks;
 using AdaptiveExpressions;
 using Microsoft.Bot.Builder;
+using Iciclecreek.Bot.Builder.Dialogs.Recognizers.QLucene;
+using Microsoft.Bot.Builder.AI.QnA;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -178,9 +180,21 @@ namespace Microsoft.BotBuilderSamples
                 Recognizers = new List<Recognizer>()
                 {
                     CreateLuisRecognizer(configuration),
-                    CreateQnAMakerRecognizer(configuration)
+                    //CreateQnAMakerRecognizer(configuration)
+                    CreateQLuceneRecognizer()
                 }
             };
+        }
+
+        private static Recognizer CreateQLuceneRecognizer()
+        {
+            var fullPath = Path.Join(".", "generated", $"{nameof(AddToDoDialog)}.qna.json");
+            var fileContent = File.ReadAllText(fullPath);
+            var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
+            qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");
+            qLuceneRecognizer.IncludeDialogNameInMetadata = true;
+            qLuceneRecognizer.Id = $"QnA_{nameof(AddToDoDialog)}";
+            return qLuceneRecognizer;
         }
 
         private static Recognizer CreateQnAMakerRecognizer(IConfiguration configuration)

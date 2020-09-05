@@ -58,6 +58,7 @@ This sample demonstrates using [Adaptive dialog][1],  [Language Generation][2] f
 
 ```bash
 > npm i -g @microsoft/botframework-cli
+> dotnet tool install --global QLuBuild --version 4.10.1
 ```
 
 - In a command prompt, navigate to `samples/csharp_dotnetcore/adaptive-dialog/08.todo-bot-luis-qnamaker`
@@ -83,7 +84,8 @@ This sample demonstrates using [Adaptive dialog][1],  [Language Generation][2] f
 - Run qnamaker:build to create/ update, train and publish QnA Maker KBs required to run this bot. The content for the KB comes from .qna files under dialogs.
 
 ```bash
-> bf qnamaker:build --in ../generated --out ../generated --botName TodoBotWithLuisAndQnA --log --subscriptionKey <Your QnA subscription key>
+> cd ..\generated
+> qlucene .
 ```
 
 - This command writes out a bunch of .dialog files (which are useful if you are using declarative form of adaptive dialogs) as well as qnamaker.settings.\<youralias>.\<region>.json file.

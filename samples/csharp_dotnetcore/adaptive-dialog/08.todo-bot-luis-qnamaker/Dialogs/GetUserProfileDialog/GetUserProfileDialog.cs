@@ -7,8 +7,10 @@ using System.IO;
 using System.Threading.Tasks;
 using AdaptiveExpressions;
 using AdaptiveExpressions.Properties;
+using Iciclecreek.Bot.Builder.Dialogs.Recognizers.QLucene;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.AI.Luis;
+using Microsoft.Bot.Builder.AI.QnA;
 using Microsoft.Bot.Builder.AI.QnA.Recognizers;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Adaptive;
@@ -218,9 +220,21 @@ namespace Microsoft.BotBuilderSamples
                 Recognizers = new List<Recognizer>()
                 {
                     CreateLuisRecognizer(configuration),
-                    CreateQnAMakerRecognizer(configuration)
+                    //CreateQnAMakerRecognizer(configuration)
+                    CreateQLuceneRecognizer()
                 }
             };
+        }
+
+        private static Recognizer CreateQLuceneRecognizer()
+        {
+            var fullPath = Path.Join(".", "generated", $"{nameof(GetUserProfileDialog)}.qna.json");
+            var fileContent = File.ReadAllText(fullPath);
+            var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
+            qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");
+            qLuceneRecognizer.IncludeDialogNameInMetadata = true;
+            qLuceneRecognizer.Id = $"QnA_{nameof(GetUserProfileDialog)}";
+            return qLuceneRecognizer;
         }
 
         private static Recognizer CreateQnAMakerRecognizer(IConfiguration configuration)
