@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Iciclecreek.Bot.Builder.Dialogs.Recognizers.QLucene" Version="4.10.5" />
+    <PackageReference Include="Iciclecreek.Bot.Builder.Dialogs.Recognizers.QLucene" Version="4.10.6" />
     <PackageReference Include="Microsoft.Bot.Builder.Dialogs.Adaptive" Version="4.10.2" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.10.2" />
     <PackageReference Include="Microsoft.Bot.Builder.LanguageGeneration" Version="4.10.2" />

@@ -24,6 +24,7 @@ using Microsoft.Bot.Builder;
 using Iciclecreek.Bot.Builder.Dialogs.Recognizers.QLucene;
 using Microsoft.Bot.Builder.AI.QnA;
 using Microsoft.Recognizers.Text.DateTime;
+using System.Linq;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -42,9 +43,9 @@ namespace Microsoft.BotBuilderSamples
                 Recognizer = CreateCrossTrainedRecognizer(configuration),
                 Triggers = new List<OnCondition>()
                 {
-                    new OnBeginDialog() 
+                    new OnBeginDialog()
                     {
-                        Actions = new List<Dialog>() 
+                        Actions = new List<Dialog>()
                         {
                             // Handle case where there are no items in todo list
                             new IfCondition()
@@ -191,7 +192,8 @@ namespace Microsoft.BotBuilderSamples
             dc.State.TryGetValue("turn.entities.todoTitle", out todoTitle);
             if (todoTitle != null && todoTitle.Length != 0)
             {
-                if (Array.Exists(todoList, e => e == todoTitle[0])) {
+                if (Array.Exists(todoList, e => e == todoTitle[0]))
+                {
                     todoTitleStr = todoTitle[0];
                 }
             }
@@ -217,7 +219,7 @@ namespace Microsoft.BotBuilderSamples
 
         private static Recognizer CreateQLuceneRecognizer()
         {
-            var fullPath = Path.Join(".", "generated", $"{nameof(DeleteToDoDialog)}.qna.json");
+            var fullPath = Directory.EnumerateFiles(".", $"{nameof(DeleteToDoDialog)}.qna.json", SearchOption.AllDirectories).First();
             var fileContent = File.ReadAllText(fullPath);
             var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
             qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");

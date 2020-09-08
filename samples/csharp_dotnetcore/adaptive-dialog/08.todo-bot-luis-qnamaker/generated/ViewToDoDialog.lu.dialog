@@ -1,0 +1,8 @@
+{
+    "$kind": "Microsoft.MultiLanguageRecognizer",
+    "id": "LUIS_ViewToDoDialog",
+    "recognizers": {
+        "en-us": "ViewToDoDialog.en-us.lu",
+        "": "ViewToDoDialog.en-us.lu"
+    }
+}

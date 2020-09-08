@@ -1,0 +1,26 @@
+{
+  "urls": [],
+  "qnaList": [
+    {
+      "id": 0,
+      "answer": "No, I do not support that yet. But I will let the development team know you are looking for it!",
+      "source": "custom editorial",
+      "questions": [
+        "Can I delete all"
+      ],
+      "metadata": []
+    },
+    {
+      "id": 0,
+      "answer": "Unfortunately I do not support that yet.",
+      "source": "custom editorial",
+      "questions": [
+        "delete all items"
+      ],
+      "metadata": []
+    }
+  ],
+  "files": [],
+  "name": "",
+  "hash": "DBFDA4F859764FF0AEE46E1AD3D66A0580EB063D67D8634B94835A81ACA8E3BF"
+}

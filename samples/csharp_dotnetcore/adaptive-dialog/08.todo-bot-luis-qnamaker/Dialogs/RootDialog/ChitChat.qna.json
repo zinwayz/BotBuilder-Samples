@@ -2,68 +2,6 @@
   "urls": [],
   "qnaList": [
     {
-      "id": 28,
-      "answer": "${HelpRootDialog()}",
-      "source": "custom editorial",
-      "questions": [
-        "Help",
-        "what can you do?",
-        "I need help",
-        "help please",
-        "What can I say?"
-      ],
-      "metadata": [
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
-        }
-      ],
-      "context": {
-        "isContextOnly": false,
-        "prompts": []
-      }
-    },
-    {
-      "id": 29,
-      "answer": "Sorry, I do not support that yet. But I will let the development team know!",
-      "source": "custom editorial",
-      "questions": [
-        "Can I move an item from one list to another?",
-        "move item",
-        "move mango to grocery list"
-      ],
-      "metadata": [
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
-        }
-      ],
-      "context": {
-        "isContextOnly": false,
-        "prompts": []
-      }
-    },
-    {
-      "id": 30,
-      "answer": "I need your profile to provide you the best experience. See http://contoso.com/privacy to learn more about our privacy policy.",
-      "source": "custom editorial",
-      "questions": [
-        "What do you do with my profile?",
-        "why profile?",
-        "profile?"
-      ],
-      "metadata": [
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
-        }
-      ],
-      "context": {
-        "isContextOnly": false,
-        "prompts": []
-      }
-    },
-    {
       "id": 1,
       "answer": "I don't have a body.",
       "source": "qna_chitchat_Professional.tsv",
@@ -147,10 +85,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -280,10 +214,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -348,10 +278,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -496,10 +422,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -576,10 +498,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -806,10 +724,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -906,10 +820,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -995,10 +905,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -1247,10 +1153,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -1333,10 +1235,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -1477,10 +1375,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -1630,10 +1524,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -1742,10 +1632,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -1920,10 +1806,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -2032,10 +1914,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -2091,10 +1969,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -2168,10 +2042,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -2216,10 +2086,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -2389,10 +2255,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -2586,10 +2448,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -2645,10 +2503,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -2942,10 +2796,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -3140,10 +2990,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -3206,10 +3052,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -3452,10 +3294,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -3625,10 +3463,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -3765,146 +3599,6 @@
         {
           "name": "editorial",
           "value": "chitchat"
-        },
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
-        }
-      ],
-      "context": {
-        "isContextOnly": false,
-        "prompts": []
-      }
-    },
-    {
-      "id": 31,
-      "answer": "intent=DeferToRecognizer_LUIS_RootDialog",
-      "source": "crosstrained",
-      "questions": [
-        "hi",
-        "hello",
-        "good morning",
-        "good afternoon",
-        "good evening",
-        "Add item",
-        "Add todo",
-        "add a to do item",
-        "Please remind me to buy milk",
-        "Please remember that I need to buy milk",
-        "I need you to remember that my wife's birthday is Jan 9th",
-        "Add a todo named send report over this weekend",
-        "Add get a new car to the todo list",
-        "Add write a spec to the list",
-        "Add finish this demo to my todo list",
-        "add a todo item vacuuming by october 3rd",
-        "add call my mother to my todo list",
-        "add due date august to peanut butter jelly bread milk on todos list",
-        "add go running to my todos",
-        "add to my todos list mail the insurance forms out by saturday",
-        "can i add shirts on the todos list",
-        "could i add medicine to the todos list",
-        "would you add heavy cream to the todos list",
-        "add a to do that purchase a nice sweater",
-        "add a to do to buy shoes",
-        "add an task of chores to do around the house",
-        "add go to whole foods in my to do list",
-        "add reading to my to do list",
-        "add this thing in to do list",
-        "add to my to do list pick up clothes",
-        "add to my to do list print papers for 10 copies this afternoon",
-        "create to do",
-        "create to do that read a book tonight",
-        "create to do to go running in the park",
-        "put hikes on my to do list",
-        "remind me to pick up dry cleaning",
-        "new to do",
-        "add another one",
-        "add",
-        "Delete item",
-        "Remove todo",
-        "Mark buy milk as complete",
-        "Flag first one as done",
-        "Remove finish this demo from the todo list",
-        "remove another one",
-        "remove",
-        "clear my todo named get a new car",
-        "I'm done with the first todo",
-        "I finished the las todo",
-        "Remove the first todo",
-        "Delete todo",
-        "Clear my todos",
-        "Delete all my todos",
-        "Remove all my todo",
-        "Forget the list",
-        "Purge the todo list",
-        "can you delete todo1",
-        "can you delete xxx item",
-        "delete eggs from list",
-        "delete off pancake mix on the shopping list",
-        "delete shampoo from shopping list",
-        "delete shirts from list",
-        "delete task go fishing",
-        "delete task go to cinema tonight",
-        "delete the item buy socks from my todo list",
-        "delete the second task in my shopping list",
-        "delete the task house cleanup this weekend",
-        "delete the task that hit the gym every morning",
-        "delete the to do meet my friends tomorrow",
-        "delete the to do that daily practice piano",
-        "delete the to do that meet john when he come here the next friday",
-        "delete to do buy milk",
-        "delete to do go shopping",
-        "delete to do that go hiking tomorrow",
-        "erase bananas from shopping list",
-        "erase peanuts on the shopping list",
-        "remove asprin from shopping list",
-        "remove black shoes from shopping list",
-        "remove class from todo list",
-        "remove salad vegetables from grocery list",
-        "remove task buy dog food",
-        "remove task go shopping",
-        "remove task that go hiking this weekend",
-        "remove task that lawn mowing",
-        "remove the item paris from my list",
-        "remove the task that go to library after work",
-        "remove the to do physical examination",
-        "remove the to do that pick tom up at six p.m.",
-        "remove to do go to the gym",
-        "remove to do that go to the dentist tomorrow morning",
-        "View lists",
-        "show my todo",
-        "can you please show my todos?",
-        "please show my todo list",
-        "todo list please",
-        "I need to see my todo list",
-        "can you show me the list?",
-        "please show the list",
-        "what do i have on my todo?",
-        "what is on my list?",
-        "do i have anything left on my todo list?",
-        "I hope I do not have any todo left",
-        "do i have any tasks left?",
-        "hit me up with more items",
-        "view my todos",
-        "can you show my todo",
-        "see todo",
-        "I would like to see my todos list",
-        "show all my lists",
-        "show my lists",
-        "what do i have on my list?",
-        "get started",
-        "Profile",
-        "cancel",
-        "cancel that",
-        "stop that",
-        "abort",
-        "yes",
-        "no"
-      ],
-      "metadata": [
-        {
-          "name": "dialogName",
-          "value": "RootDialog"
         }
       ],
       "context": {
@@ -3914,5 +3608,6 @@
     }
   ],
   "files": [],
-  "name": ""
+  "name": "",
+  "hash": "D4FC58365A684BE265D8DF53D5BED55BED117F92CC95CB51EB014F491C871090"
 }

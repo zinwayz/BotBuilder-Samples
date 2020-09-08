@@ -1,0 +1,18 @@
+{
+  "urls": [],
+  "qnaList": [
+    {
+      "id": 0,
+      "answer": "No, I do not support that yet. But I will let the development team know you are looking for it!",
+      "source": "custom editorial",
+      "questions": [
+        "Can I add multiple items?",
+        "more than one item at a time"
+      ],
+      "metadata": []
+    }
+  ],
+  "files": [],
+  "name": "",
+  "hash": "FBCCB3F922918AF270E653EF8FA466481C20163C8C2F58D93B56D35EC919D0AB"
+}

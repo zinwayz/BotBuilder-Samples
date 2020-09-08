@@ -23,6 +23,7 @@ using System.Net.WebSockets;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.AI.QnA;
 using AdaptiveExpressions.Properties;
+using System.Linq;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -68,15 +69,15 @@ namespace Microsoft.BotBuilderSamples
                         // This expression ensures that this trigger only fires if the confidence score for the 
                         // AddToDoDialog intent classification is at least 0.7
                         Condition = "#AddItem.Score >= 0.5",
-                        Actions = new List<Dialog>() 
+                        Actions = new List<Dialog>()
                         {
                             new BeginDialog(nameof(AddToDoDialog)),
                         },
                     },
-                    new OnIntent("DeleteItem") 
+                    new OnIntent("DeleteItem")
                     {
                         Condition = "#DeleteItem.Score >= 0.5",
-                        Actions = new List<Dialog>() 
+                        Actions = new List<Dialog>()
                         {
                             new BeginDialog(nameof(DeleteToDoDialog)),
                         },
@@ -84,7 +85,7 @@ namespace Microsoft.BotBuilderSamples
                     new OnIntent("ViewItem")
                     {
                         Condition = "#ViewItem.Score >= 0.5",
-                        Actions = new List<Dialog>() 
+                        Actions = new List<Dialog>()
                         {
                             new BeginDialog(nameof(ViewToDoDialog)),
                         },
@@ -100,7 +101,7 @@ namespace Microsoft.BotBuilderSamples
                     new OnIntent("Cancel")
                     {
                         Condition = "#Cancel.Score >= 0.8",
-                        Actions = new List<Dialog>() 
+                        Actions = new List<Dialog>()
                         {
                             // Ask user for confirmation.
                             // This input will still use the recognizer and specifically the confirm list entity extraction.
@@ -363,7 +364,7 @@ namespace Microsoft.BotBuilderSamples
 
         private static Recognizer CreateQLuceneRecognizer()
         {
-            var fullPath = Path.Join(".", "generated", $"{nameof(RootDialog)}.qna.json");
+            var fullPath = Directory.EnumerateFiles(".", $"{nameof(RootDialog)}.qna.json", SearchOption.AllDirectories).First();
             var fileContent = File.ReadAllText(fullPath);
             var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
             qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");

@@ -23,6 +23,7 @@ using AdaptiveExpressions;
 using Microsoft.Bot.Builder;
 using Iciclecreek.Bot.Builder.Dialogs.Recognizers.QLucene;
 using Microsoft.Bot.Builder.AI.QnA;
+using System.Linq;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -43,9 +44,9 @@ namespace Microsoft.BotBuilderSamples
                 Recognizer = CreateCrossTrainedRecognizer(configuration),
                 Triggers = new List<OnCondition>()
                 {
-                    new OnBeginDialog() 
+                    new OnBeginDialog()
                     {
-                        Actions = new List<Dialog>() 
+                        Actions = new List<Dialog>()
                         {
                             // See if any list has any items.
                             new IfCondition()
@@ -121,7 +122,7 @@ namespace Microsoft.BotBuilderSamples
 
         private static Recognizer CreateQLuceneRecognizer()
         {
-            var fullPath = Path.Join(".", "generated", $"{nameof(ViewToDoDialog)}.qna.json");
+            var fullPath = Directory.EnumerateFiles(".", $"{nameof(ViewToDoDialog)}.qna.json", SearchOption.AllDirectories).First();
             var fileContent = File.ReadAllText(fullPath);
             var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
             qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");

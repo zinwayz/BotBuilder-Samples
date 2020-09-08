@@ -1,0 +1,8 @@
+{
+    "$kind": "Microsoft.MultiLanguageRecognizer",
+    "id": "LUIS_GetUserProfileDialog",
+    "recognizers": {
+        "en-us": "GetUserProfileDialog.en-us.lu",
+        "": "GetUserProfileDialog.en-us.lu"
+    }
+}
