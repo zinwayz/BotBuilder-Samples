@@ -85,7 +85,7 @@ This sample demonstrates using [Adaptive dialog][1],  [Language Generation][2] f
 
 ```bash
 > cd ..\generated
-> qlucene .
+> qlubuild .
 ```
 
 - This command writes out a bunch of .dialog files (which are useful if you are using declarative form of adaptive dialogs) as well as qnamaker.settings.\<youralias>.\<region>.json file.
