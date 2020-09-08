@@ -1,0 +1,8 @@
+{
+    "$kind": "Microsoft.MultiLanguageRecognizer",
+    "id": "LUIS_AddToDoDialog",
+    "recognizers": {
+        "en-us": "AddToDoDialog.en-us.lu",
+        "": "AddToDoDialog.en-us.lu"
+    }
+}

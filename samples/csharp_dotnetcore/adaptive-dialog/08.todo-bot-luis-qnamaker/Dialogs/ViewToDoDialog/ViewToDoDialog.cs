@@ -21,6 +21,9 @@ using Microsoft.Bot.Builder.AI.QnA.Recognizers;
 using System.Threading.Tasks;
 using AdaptiveExpressions;
 using Microsoft.Bot.Builder;
+using Iciclecreek.Bot.Builder.Dialogs.Recognizers.QLucene;
+using Microsoft.Bot.Builder.AI.QnA;
+using System.Linq;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -41,9 +44,9 @@ namespace Microsoft.BotBuilderSamples
                 Recognizer = CreateCrossTrainedRecognizer(configuration),
                 Triggers = new List<OnCondition>()
                 {
-                    new OnBeginDialog() 
+                    new OnBeginDialog()
                     {
-                        Actions = new List<Dialog>() 
+                        Actions = new List<Dialog>()
                         {
                             // See if any list has any items.
                             new IfCondition()
@@ -111,9 +114,22 @@ namespace Microsoft.BotBuilderSamples
                 Recognizers = new List<Recognizer>()
                 {
                     CreateLuisRecognizer(configuration),
-                    CreateQnAMakerRecognizer(configuration)
+                    //CreateQnAMakerRecognizer(configuration)
+                    CreateQLuceneRecognizer()
                 }
             };
+        }
+
+        private static Recognizer CreateQLuceneRecognizer()
+        {
+            var fullPath = Directory.EnumerateFiles(".", $"{nameof(ViewToDoDialog)}.qna.json", SearchOption.AllDirectories).First();
+            var fileContent = File.ReadAllText(fullPath);
+            var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
+            qLuceneRecognizer.IncludeDialogNameInMetadata = false;
+            qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");
+            qLuceneRecognizer.IncludeDialogNameInMetadata = true;
+            qLuceneRecognizer.Id = $"QnA_{nameof(ViewToDoDialog)}";
+            return qLuceneRecognizer;
         }
 
         private static Recognizer CreateQnAMakerRecognizer(IConfiguration configuration)

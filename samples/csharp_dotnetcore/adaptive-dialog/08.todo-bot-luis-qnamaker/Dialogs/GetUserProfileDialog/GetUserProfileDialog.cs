@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using AdaptiveExpressions;
 using AdaptiveExpressions.Properties;
@@ -228,11 +229,11 @@ namespace Microsoft.BotBuilderSamples
 
         private static Recognizer CreateQLuceneRecognizer()
         {
-            var fullPath = Path.Join(".", "generated", $"{nameof(GetUserProfileDialog)}.qna.json");
+            var fullPath = Directory.EnumerateFiles(".", $"{nameof(GetUserProfileDialog)}.qna.json", SearchOption.AllDirectories).First();
             var fileContent = File.ReadAllText(fullPath);
             var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
             qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");
-            qLuceneRecognizer.IncludeDialogNameInMetadata = true;
+            qLuceneRecognizer.IncludeDialogNameInMetadata = false;
             qLuceneRecognizer.Id = $"QnA_{nameof(GetUserProfileDialog)}";
             return qLuceneRecognizer;
         }
