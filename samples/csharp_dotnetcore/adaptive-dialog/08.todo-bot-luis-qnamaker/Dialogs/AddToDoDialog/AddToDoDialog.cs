@@ -192,9 +192,8 @@ namespace Microsoft.BotBuilderSamples
             var fullPath = Directory.EnumerateFiles(".", $"{nameof(AddToDoDialog)}.qna.json", SearchOption.AllDirectories).First();
             var fileContent = File.ReadAllText(fullPath);
             var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
-            qLuceneRecognizer.IncludeDialogNameInMetadata = false;
             qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");
-            qLuceneRecognizer.IncludeDialogNameInMetadata = true;
+            qLuceneRecognizer.IncludeDialogNameInMetadata = false;
             qLuceneRecognizer.Id = $"QnA_{nameof(AddToDoDialog)}";
             return qLuceneRecognizer;
         }
