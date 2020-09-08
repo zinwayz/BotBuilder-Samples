@@ -21,6 +21,8 @@ using Microsoft.Bot.Builder.AI.QnA.Recognizers;
 using System.Threading.Tasks;
 using AdaptiveExpressions;
 using Microsoft.Bot.Builder;
+using Iciclecreek.Bot.Builder.Dialogs.Recognizers.QLucene;
+using Microsoft.Bot.Builder.AI.QnA;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -111,16 +113,28 @@ namespace Microsoft.BotBuilderSamples
                 Recognizers = new List<Recognizer>()
                 {
                     CreateLuisRecognizer(configuration),
-                    CreateQnAMakerRecognizer(configuration)
+                    //CreateQnAMakerRecognizer(configuration)
+                    CreateQLuceneRecognizer()
                 }
             };
+        }
+
+        private static Recognizer CreateQLuceneRecognizer()
+        {
+            var fullPath = Path.Join(".", "generated", $"{nameof(ViewToDoDialog)}.qna.json");
+            var fileContent = File.ReadAllText(fullPath);
+            var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
+            qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");
+            qLuceneRecognizer.IncludeDialogNameInMetadata = true;
+            qLuceneRecognizer.Id = $"QnA_{nameof(ViewToDoDialog)}";
+            return qLuceneRecognizer;
         }
 
         private static Recognizer CreateQnAMakerRecognizer(IConfiguration configuration)
         {
             if (string.IsNullOrEmpty(configuration["qna:TodoBotWithLuisAndQnA_en_us_qna"]) || string.IsNullOrEmpty(configuration["QnAHostName"]) || string.IsNullOrEmpty(configuration["QnAEndpointKey"]))
             {
-                throw new Exception("NOTE: QnA Maker is not configured for RootDialog. Please follow instructions in README.md. To enable all capabilities, add 'qnamaker:qnamakerSampleBot_en_us_qna', 'qnamaker:LuisAPIKey' and 'qnamaker:endpointKey' to the appsettings.json file.");
+                throw new Exception("NOTE: QnA Maker is not configured for ViewToDoDialog. Please follow instructions in README.md. To enable all capabilities, add 'qnamaker:qnamakerSampleBot_en_us_qna', 'qnamaker:LuisAPIKey' and 'qnamaker:endpointKey' to the appsettings.json file.");
             }
 
             return new QnAMakerRecognizer()
