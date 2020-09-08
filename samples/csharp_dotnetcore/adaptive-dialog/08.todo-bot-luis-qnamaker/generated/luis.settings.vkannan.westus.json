@@ -1,0 +1,9 @@
+{
+    "luis": {
+        "GetUserProfileDialog_en_us_lu": "6c908785-6b60-4759-baf6-a5fb2b340351",
+        "DeleteToDoDialog_en_us_lu": "08a308f0-8557-4514-b83d-280e3f777a1a",
+        "AddToDoDialog_en_us_lu": "2ab3c183-22b9-43f0-a30d-afe44fba2ecc",
+        "ViewToDoDialog_en_us_lu": "610d1319-2f8b-437d-b5e9-906a94cb4c08",
+        "RootDialog_en_us_lu": "ff7f25f0-f777-45ef-a957-352faa8ac8ee"
+    }
+}
