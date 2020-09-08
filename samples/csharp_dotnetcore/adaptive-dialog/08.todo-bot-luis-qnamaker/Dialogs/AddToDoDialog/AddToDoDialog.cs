@@ -192,7 +192,7 @@ namespace Microsoft.BotBuilderSamples
             var fileContent = File.ReadAllText(fullPath);
             var qLuceneRecognizer = new QLuceneRecognizer(fileContent);
             qLuceneRecognizer.Context = new ObjectExpression<QnARequestContext>("dialog.qnaContext");
-            qLuceneRecognizer.IncludeDialogNameInMetadata = true;
+            //qLuceneRecognizer.IncludeDialogNameInMetadata = true;
             qLuceneRecognizer.Id = $"QnA_{nameof(AddToDoDialog)}";
             return qLuceneRecognizer;
         }
