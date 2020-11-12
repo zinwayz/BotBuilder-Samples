@@ -1,0 +1,35 @@
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. -->
+<!-- Licensed under the MIT License. -->
+
+<html>
+<head>
+<title>Snapshot Editor</title>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    var snapshot,model;
+    $("#submit").click(function(){
+        snapshot=$("#snapshot").val();
+        model=$("#model").val();
+        $.post("/load",{snapshot:snapshot,model:model},function(data){
+            if(data==='done') {
+                window.location.href="/editor";
+            }
+            else {
+                document.getElementById("status").innerHTML = data;
+            }
+        });
+    });
+});
+</script>
+</head>
+<body>
+    <p>Snapshot Location:</p>
+    <input type="text" size="55" placeholder="Local full path of your snapshot file (.blu)" id="snapshot"><br />
+    <p>Base Model Directory:</p>
+    <input type="text" size="55" placeholder="Folder location of base model" id="model"><br />
+    <input type="button" value="Submit" id="submit">
+    <p id="status">Waiting for input.</p>
+</body>
+</html>

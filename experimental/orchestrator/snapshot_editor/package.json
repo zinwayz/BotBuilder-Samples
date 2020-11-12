@@ -1,0 +1,21 @@
+{
+  "name": "snapshot_editor",
+  "version": "1.0.0",
+  "description": "Bot Builder v4 example that demonstrates browser-based UI to edit snapshots.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Microsoft",
+  "license": "MIT",
+  "dependencies": {
+    "@microsoft/bf-orchestrator": "beta",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "farmhash": "3.1.1",
+    "express-session": "^1.17.1",
+    "orchestrator-core": "^4.11.0-beta.2",
+    "tabulator-tables": "^4.8.4"
+  }
+}

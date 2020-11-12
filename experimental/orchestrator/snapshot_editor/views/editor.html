@@ -1,0 +1,220 @@
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. -->
+<!-- Licensed under the MIT License. -->
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link href="/tabulator.min.css" rel="stylesheet">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script type="text/javascript" src="/tabulator.min.js"></script>
+        <script>
+        </script>
+	</head>
+	<body>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <script src="/venn.js"></script>
+        <br />
+        <div>
+        <label>Enter utterance:</label>
+        <input type="text" size="55" value="Russell Wilson" id="utterance"><br />
+        <input type="button" title="Click to evaluate utterance against model" value="Submit" id="submit">
+        </div>
+        <br />
+        <p id="results" style="color:green;font-size:18px;">Welcome.</p>
+        <div id="example-table"></div>
+        <div>
+            <button id="delete-rows" title="Click to delete selected examples.">Delete</button>
+            <button id="save-snapshot" title="Save (overwrite) changes into .blu file.">Save Snapshot</button>
+            <button id="select-all" title="Select all examples.">Select All</button>
+            <button id="deselect-all" title="Unselect all examples.">Deselect All</button>
+            <button id="show-all" title="Retrieve and show all examples.">Show All</button>
+            <span id="select-stats"></span>
+        </div>        
+        
+        <br />
+        <form>
+         <fieldset>
+          <legend>Add Example</legend>
+          <p>
+           Use this to add a new example using the utterance above, classified with the following intent:</br>
+           <br />
+           <label>Intent</label>
+           <input type="text" size="55" value="Sports" id="intent"><br />
+           <br />
+           <input type="button" title="Adds a new example, will not alter your .blu file until you click Save Snapshot." value="Add Example" id="addintent">
+          </p>
+          </fieldset>
+        </form>
+        <div id="venn"></div>
+        <a href='/logout'>Quit</a>
+		<script type="text/javascript">
+            function intentsLookup(cell){
+                var result = {}
+                $.ajax({
+                    async: false,
+                    type: 'GET',
+                    url: '/intents',
+                    success: function(data) {
+                        result = data;
+                    }
+                });
+                return result;
+            }
+
+            function dataEdited(data){
+                // Data in the table changed - we must update data in snapshot.
+                var existingData = [];
+                $.ajax({
+                    async: false,
+                    type: 'GET',
+                    url: '/allexamples',
+                    success: function(existing) {
+                        existingData = existing;
+                    }
+                });
+                // Find updated data
+                const cur_table_data = new Map();
+                const diff = new Map();
+                var key = null;
+
+                // Current (filtered) data in table view
+                for (var i = 0; i < data.length; i++) {
+                    key = data[i].id;
+                    cur_table_data.set(key, { text: data[i].text, intent: data[i].intent });
+                }
+                // Merge original into filtered list.
+                for (var i = 0; i < existingData.length; i++) {
+                    var existing = existingData[i];
+                    key = existing.id;
+                    if (cur_table_data.has(key)) {
+                        var cur = cur_table_data.get(key);
+                        if (cur.text != existing.text || cur.intent != existing.intent) {
+                            // Data edited 
+                            //  cur == new data to add.
+                            //  existing == old data to delete.
+                            $.ajax({
+                                async: false,
+                                type: 'POST',
+                                url: '/addexample',
+                                data: {addintent:cur.intent, utterance:cur.text},
+                                success: function(data) {
+                                    result = data;
+                                }
+                            });
+                            document.getElementById("results").innerHTML = "Updating " + cur.intent;
+                            $.ajax({
+                                async: false,
+                                type: 'POST',
+                                url: '/delete',
+                                data: {utterance:existing.text, intent:existing.intent},
+                                success: function(data) {
+                                    result = data;
+                                }
+                            });
+                            document.getElementById("results").innerHTML = 'Updated "' + cur.text +'" with intent "' + cur.intent + '" successfully!';
+                            break;
+                        }
+                    }
+                }
+                    table.replaceData();
+            }
+
+            var table = new Tabulator("#example-table", {
+                height:350, // set height of table to enable virtual DOM
+                layout:"fitColumns", //fit columns to width of table (optional)
+                dataEdited:dataEdited,
+                initialSort:[
+                    {column:"score", dir:"desc"}, 
+                ],
+                columns:[ //Define Table Columns
+                    {formatter:"rowSelection", width:20, titleFormatter:"rowSelection", hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                            cell.getRow().toggleSelect();
+                        }},                
+                    {title:"Text", field:"text", sorter:"string", editor:"input",  headerFilter:"input", width:350},
+                    {title:"Intent", field:"intent", editor:"select", editorParams:intentsLookup, headerFilter:"input"},
+                    {title:"Score", field:"score", sorter:"number", hozAlign:"left", formatter:"progress"},
+                    {title:"Val", field:"score_val", sorter:"number"},
+                ],
+                ajaxURLGenerator:function(url, config, params){
+                    return  "/tabledata";
+                },
+            });
+
+            document.getElementById("delete-rows").addEventListener("click", function(){
+                var selectedData = table.getSelectedData();
+                var rows = table.getSelectedRows();
+                var msg1 = 'Deleted row(s):';
+                for (let row of selectedData) {
+                    var utterance = row.text;
+                    var intent = row.intent;    
+                    
+                    $.post("/delete",{utterance:utterance, intent:intent}, function(data){
+                        if(data==='done') {
+                            msg1 = msg1 + '"' + utterance + '" with intent "' + intent + '", ';
+                            document.getElementById("results").innerHTML = 'Deleted row "' + utterance + '" with intent "' + intent + '"!';
+                            table.replaceData();
+                        }
+                    });
+                }
+                if (selectedData.length > 0) {
+                    document.getElementById("results").innerHTML = msg1;
+                }
+
+            });
+
+            //deselect row on "deselect" button click
+            document.getElementById("save-snapshot").addEventListener("click", function(){
+                    $.post("/save",{}, function(data){
+                        if(data==='done') {
+                            document.getElementById("results").innerHTML = "Saved snapshot!";
+                        }
+                        else {
+                            document.getElementById("results").innerHTML = "Error saving snapshot!";
+                        }
+                    });
+            });
+
+            document.getElementById("select-all").addEventListener("click", function(){
+                table.selectRow();
+            });
+
+            document.getElementById("deselect-all").addEventListener("click", function(){
+                table.deselectRow();
+            });            
+
+            document.getElementById("show-all").addEventListener("click", function(){
+                var allData = [];
+                $.ajax({
+                    async: false,
+                    type: 'GET',
+                    url: '/allexamples',
+                    success: function(data) {
+                        allData = data;
+                    }
+                });
+                document.getElementById("results").innerHTML = 'Showing all the examples.';
+                table.replaceData(allData);
+            });            
+            $(document).ready( function(){
+                var utterance,addintent;
+                $("#submit").click( function(){
+                    utterance=$("#utterance").val();
+                    $.post("/inference",{utterance:utterance}, function(data){
+                        table.replaceData();
+                        document.getElementById("results").innerHTML = 'Results from text "' + utterance + '"';
+                    });
+                });
+                $("#addintent").click( function(){
+                    addintent=$("#intent").val();
+                    utterance=$("#utterance").val();
+                    $.post("/addexample",{addintent:addintent, utterance:utterance}, function(data){
+                        table.replaceData();
+                        document.getElementById("results").innerHTML = 'Added new example with text "' + utterance + '" with intent "' + addintent + '".  Click Save to save to snapshot.';
+                    });
+                });
+
+            });
+        </script>
+
+	</body>
+</html>
