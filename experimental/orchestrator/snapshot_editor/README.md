@@ -52,8 +52,6 @@ In web browser navigate to:
 
 ## Wish List
 
-- Show visualization of intent results
-   - Show venn diagram of intent results to help understand utterance in relation to all intents. 
 - LU file support
    - Load/save to/from LU format.
 - Automatic download of model.

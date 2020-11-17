@@ -16,7 +16,7 @@
         <br />
         <div>
         <label>Enter utterance:</label>
-        <input type="text" size="55" value="Russell Wilson" id="utterance"><br />
+        <input type="text" size="55" value="How do I enroll in school?" id="utterance"><br />
         <input type="button" title="Click to evaluate utterance against model" value="Submit" id="submit">
         </div>
         <br />
@@ -45,9 +45,115 @@
           </p>
           </fieldset>
         </form>
+        <label>Show overlap of top results: </label>
+        <span id="percentValue"></span> 
+        <input type="range"
+               id="percentRange"
+               min="1"
+               max="99" 
+               step="1"
+               value="1"
+               oninput="ChangePercentOverlap(this.value)"> 
         <div id="venn"></div>
         <a href='/logout'>Quit</a>
-		<script type="text/javascript">
+        
+        <script type="text/javascript">
+            // Should be passed down from server.
+            const VENN_PERCENT_DEFAULT=1;
+            function ChangePercentOverlap(newvalue) { 
+                refreshVenn(newvalue);
+                document.getElementById("percentValue").innerHTML = newvalue + '%'; 
+            } 
+
+            var VENNSET = [];
+            document.getElementById("percentValue").innerHTML = VENN_PERCENT_DEFAULT + '%';
+            $.ajax({
+                async: false,
+                type: 'POST',
+                url: '/vennset',
+                success: function(data) {
+                    VENNSET = data;
+                }
+            });
+
+            var chart = venn.VennDiagram()
+                            .width(500)
+                            .height(500);
+            var div = d3.select("#venn")
+            div.datum(VENNSET).call(chart);
+            
+            function refreshVenn(percent=0){
+                $.ajax({
+                    async: false,
+                    type: 'POST',
+                    url: '/vennset',
+                    data: { percent:percent },
+                    success: function(data) {
+                        VENNSET = data;
+                    }
+                });
+                var div = d3.select("#venn")
+                div.datum(VENNSET).call(chart);
+                var tooltip = d3.select("body").append("div")
+                    .attr("class", "venntooltip");
+
+                div.selectAll("path")
+                    .style("stroke-opacity", 0)
+                    .style("stroke", "#fff")
+                    .style("stroke-width", 3)
+
+                div.selectAll("g")
+                    .on("mouseover", function(d, i) {
+                        // sort all the areas relative to the current item
+                        venn.sortAreas(div, d);
+
+                        // Display a tooltip with the current size
+                        tooltip.transition().duration(400).style("opacity", .9);
+                        tooltip.text(d.size + " examples");
+
+                        // highlight the current path
+                        var selection = d3.select(this).transition("tooltip").duration(400);
+                        selection.select("path")
+                            .style("fill-opacity", d.sets.length == 1 ? .4 : .1)
+                            .style("stroke-opacity", 1);
+                    })
+
+                    .on("mousemove", function() {
+                        tooltip.style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    })
+                    .on("click", function() {
+                        var mouse = d3.mouse(this);
+                        var data = d3.select(this).datum();
+                        var intent = data.intent;
+                        if (intent) {
+                            $.ajax({
+                                async: false,
+                                type: 'GET',
+                                url: '/venntabledata',
+                                data: {intent:intent},
+                                success: function(data) {
+                                    // alert(JSON.stringify(data));
+                                    document.getElementById("results").innerHTML = 'Showing examples of intent "' + intent + '" from diagram below.';
+                                    table.replaceData(data);
+                                }
+                            });
+                        }
+
+                        
+                    })
+
+                    .on("mouseout", function(d, i) {
+                        tooltip.transition().duration(400).style("opacity", 0);
+                        var selection = d3.select(this).transition("tooltip").duration(400);
+                        selection.select("path")
+                            .style("fill-opacity", d.sets.length == 1 ? .25 : .0)
+                            .style("stroke-opacity", 0);
+                    });
+
+            }
+
+
             function intentsLookup(cell){
                 var result = {}
                 $.ajax({
@@ -158,6 +264,7 @@
                 }
                 if (selectedData.length > 0) {
                     document.getElementById("results").innerHTML = msg1;
+                    
                 }
 
             });
@@ -194,14 +301,17 @@
                 });
                 document.getElementById("results").innerHTML = 'Showing all the examples.';
                 table.replaceData(allData);
-            });            
+            });  
+
             $(document).ready( function(){
                 var utterance,addintent;
                 $("#submit").click( function(){
                     utterance=$("#utterance").val();
                     $.post("/inference",{utterance:utterance}, function(data){
                         table.replaceData();
+                        refreshVenn();
                         document.getElementById("results").innerHTML = 'Results from text "' + utterance + '"';
+
                     });
                 });
                 $("#addintent").click( function(){
@@ -212,8 +322,10 @@
                         document.getElementById("results").innerHTML = 'Added new example with text "' + utterance + '" with intent "' + addintent + '".  Click Save to save to snapshot.';
                     });
                 });
+                
 
             });
+
         </script>
 
 	</body>
