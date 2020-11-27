@@ -80,7 +80,7 @@
 - ${[`${type}Property.lg`, `${type}-missing.dialog`, `${type}-help.dialog`, `${type}-clear.dialog`, `${type}-show.dialog`, `${type}-change.dialog`]}
 
 # entityTemplates()
-- ${[`${entity}Entity.lu`, `${entity}Entity.lg`, `${entity}Entity-add-${type}.dialog`, `${entity}Entity-remove-${type}.dialog`]}
+- ${[`${entity}.lu`, `${entity}.lg`, `${entity}-add-${type}.dialog`, `${entity}-remove-${type}.dialog`]}
 
 # propertyLGTemplates(type)
 - ${`${locale}/${type}Property.${locale}.lg`}

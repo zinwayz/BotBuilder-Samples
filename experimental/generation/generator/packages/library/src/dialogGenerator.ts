@@ -326,7 +326,7 @@ async function processTemplate(
             if (foundTemplate === undefined && templateName.includes('Entity')) {
                 // If we can't find an entity, try for a generic definition
                 feedback(FeedbackType.debug, `Generic of ${templateName}`)
-                templateName = templateName.replace(/.*Entity/, 'generic')
+                templateName = templateName.replace(/.*Entity/, 'genericEntity')
                 foundTemplate = await findTemplate(templateName, templateDirs)
             }
             if (foundTemplate !== undefined) {
